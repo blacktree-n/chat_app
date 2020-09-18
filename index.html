@@ -32,8 +32,9 @@
             </div>
         </div> 
         <div class="main_column"> 
-            <div class="main_column_output">
-                カレーの話題を話し合うスレです。
+            <div class="main_column_output" id="main_column_output">
+                <p>カレーの話題を話し合うスレです。</p>
+                
             </div>
         </div>
     </main>
@@ -86,17 +87,22 @@
 
     //スレッドのタイトル送信
     $("#make_title_send").on("click",function(){
-    const thread_title = $("#input_title").val();
-    const msg = {
-        thread_title: thread_title
-    }
-    db.ref().push(msg); //set()は決まった名前、pushはユニークな名前(前に入力したものが上書きされる)   // ref.set("book");
-    // $('#output').scrollTop($('#output')[0].scrollHeight);
-    // フォームクリア
-    $("#input_title").val("")
+        const thread_title = $("#input_title").val();
+        const msg = {
+            thread_title: thread_title
+        }
+        console.log(msg.thread_title)
+        if(msg.thread_title == ""){
+            alert("タイトルとなる文字を入力してください");
+            return;
+        }
+        db.ref().push(msg); //set()は決まった名前、pushはユニークな名前(前に入力したものが上書きされる)   // ref.set("book");
+        // $('#output').scrollTop($('#output')[0].scrollHeight);
+        // フォームクリア
+        $("#input_title").val("")
     });
 
-    //受信処理
+    //スレッドタイトルの受信処理
     db.ref().on("child_added",function(data){
         const v = data.val(); //ここの.val()はfirebaseの書き方 送信されたオブジェクトを取得
         const k = data.key;  //ユニークキーの取得
@@ -113,16 +119,16 @@
         title_id = k
         const ref_title_id = firebase.database().ref(title_id);
         
-        //クリックしたことによりスレッド内容を表示
-        db.ref('test2').once('value',function(obj){
-        var key=obj.key; //オブジェクトのキーを取得
-        var data=obj.val(); //オブジェクトを取得
-        console.log(key);
-        console.log(data);
+        クリックしたことによりスレッド内容を表示
+        db.ref(title_id).on("child_added",function(data){
+            const v = data.val(); //ここの.val()はfirebaseの書き方 送信されたオブジェクトを取得
+            const h = '<p class="p_header">'+v.uname+'  '+v.make_text_time+'</p><p>'+v.text+'</p>';
+            // console.log(data);
+            $("#main_column_output").append(h);
         });
     });
 
-    //スレッド内のテキストを送信
+    //スレッド内テキストを送信
     $("#make_text_send").on("click",function(){
         let now = new Date();   
         let month = now.getMonth()+1;
@@ -131,10 +137,12 @@
         let minute = now.getMinutes();
         let current_time = `${month}/${date}  ${hour}:${minute}`
 
-        const uname = $("#uname").val();
+        let uname = $("#uname").val();
         const make_text_time = current_time
         const text = $("#text").val();
-        
+        if(uname == ""){
+            uname = "名無しさん";
+        }
         const msg = {
             uname: uname,
             make_text_time: make_text_time,
@@ -143,8 +151,18 @@
         db.ref(title_id).push(msg); //set()は決まった名前、pushはユニークな名前(前に入力したものが上書きされる)
         // $('#output').scrollTop($('#output')[0].scrollHeight);
         //フォームの初期化
-        $("#uname").val("")
+        // $("#uname").val("")
         $("#text").val("")
     });
 
+    //スレッド内テキストの受信
+    // db.ref(title_id).on("child_added",function(data){
+    //     if(title_id == null){
+    //         return;
+    //     }
+    //     const v = data.val(); //ここの.val()はfirebaseの書き方 送信されたオブジェクトを取得
+    //     const h = '<p class="p_header">'+v.uname+'  '+v.make_text_time+'</p><p>'+v.text+'</p>';
+    //     // console.log(data);
+    //     $("#main_column_output").append(h);
+    // });
 </script>
