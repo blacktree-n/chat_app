@@ -10,8 +10,6 @@
     <!-- JQuery読み込み -->
     <script src="js/jquery-2.1.3.min.js"></script>
     
-    
-
 
 </head>
 <header>
@@ -109,6 +107,9 @@
         // console.log(k);
         const h = '<li class="title" id='+k+'>'+v.thread_title+'</li>';
         $("#sidebar_title_list").append(h);
+        // if(typeof k !== null){
+        //     const h = '<p class="p_header">名前：'+v.k.uname+'　　　　　書き込み日時：'+v.k.make_text_time+'</p><p>'+v.k.text+'</p>';
+        // }
     });
 
     // スレッドタイトルのクリック処理
@@ -118,13 +119,18 @@
         console.log(k);
         title_id = k
         const ref_title_id = firebase.database().ref(title_id);
+        console.log(ref_title_id);
+        // スレッドの表示内容をクリア
+        $("#main_column_output").empty();
         
-        クリックしたことによりスレッド内容を表示
+        // スレッド内容を表示
         db.ref(title_id).on("child_added",function(data){
             const v = data.val(); //ここの.val()はfirebaseの書き方 送信されたオブジェクトを取得
-            const h = '<p class="p_header">'+v.uname+'  '+v.make_text_time+'</p><p>'+v.text+'</p>';
-            // console.log(data);
-            $("#main_column_output").append(h);
+            if(typeof v.uname !== 'undefined'){
+                const h = '<p class="p_header">名前：'+v.uname+'　　　　　書き込み日時：'+v.make_text_time+'</p><p>'+v.text+'</p>';
+                console.log(data);
+                $("#main_column_output").append(h);
+            }
         });
     });
 
@@ -157,12 +163,9 @@
 
     //スレッド内テキストの受信
     // db.ref(title_id).on("child_added",function(data){
-    //     if(title_id == null){
-    //         return;
-    //     }
-    //     const v = data.val(); //ここの.val()はfirebaseの書き方 送信されたオブジェクトを取得
-    //     const h = '<p class="p_header">'+v.uname+'  '+v.make_text_time+'</p><p>'+v.text+'</p>';
-    //     // console.log(data);
-    //     $("#main_column_output").append(h);
-    // });
+    //         const v = data.val(); //ここの.val()はfirebaseの書き方 送信されたオブジェクトを取得
+    //         const h = '<p class="p_header">名前：'+v.uname+'　　　　　書き込み日時：'+v.make_text_time+'</p><p>'+v.text+'</p>';
+    //         console.log(data);
+    //         $("#main_column_output").append(h);
+    //     });
 </script>
